@@ -40,6 +40,8 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         "(per process) and config.accumsteps =",
         config.accumsteps,
     )
+    mlflow.log_param("bsize", config.bsize)
+    mlflow.log_param("accumsteps", config.accumsteps)
 
     if collection is not None:
         if config.reranker:
@@ -88,6 +90,9 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         print(
             f"#> LR will use {config.warmup} warmup steps and linear decay over {config.maxsteps} steps."
         )
+        mlflow.log_param("warmup", config.warmup)
+        mlflow.log_param("maxsteps", config.maxsteps)
+
         scheduler = get_linear_schedule_with_warmup(
             optimizer,
             num_warmup_steps=config.warmup,
@@ -149,12 +154,16 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
                     loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)(
                         log_scores, target_scores
                     )
+
                 else:
                     loss = nn.CrossEntropyLoss()(scores, labels[: scores.size(0)])
+                    mlflow.log_metric("cross_entropy_loss", loss.item())
 
                 if config.use_ib_negatives:
                     if config.rank < 1:
                         print("\t\t\t\t", loss.item(), ib_loss.item())
+                        mlflow.log_metric("ib_loss", ib_loss.item())
+                        mlflow.log_metric("loss", loss.item())
 
                     loss += ib_loss
 
@@ -169,6 +178,8 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
         train_loss = this_batch_loss if train_loss is None else train_loss
         train_loss = train_loss_mu * train_loss + (1 - train_loss_mu) * this_batch_loss
+
+        mlflow.log_metric("train_loss", train_loss)
 
         amp.step(colbert, optimizer, scheduler)
 
