@@ -21,3 +21,6 @@ __pycache__/
 # Other
 .vscode
 *.tsv
+.venv/ 
+build/  
+ 

@@ -30,7 +30,6 @@ MARCO_DOCS = [
 
 
 def test_query_basic_tensorize(args: argparse.Namespace) -> None:
-    
     print("Testing QueryTokenizer.tensorize shape and marker position")
     config = ColBERTConfig.load_from_checkpoint(args.checkpoint)
     query_tokenizer = QueryTokenizer(config)
@@ -43,19 +42,25 @@ def test_query_basic_tensorize(args: argparse.Namespace) -> None:
             print(example, "\n")
 
         print(f"{ids.shape=}")
-    
-    assert ids.shape == (len(MARCO_QUERIES), config.query_maxlen), "Ids shape is not as expected"
-    assert mask.shape == (len(MARCO_QUERIES), config.query_maxlen), "Mask shape is not as expected"
+
+    assert ids.shape == (
+        len(MARCO_QUERIES),
+        config.query_maxlen,
+    ), "Ids shape is not as expected"
+    assert mask.shape == (
+        len(MARCO_QUERIES),
+        config.query_maxlen,
+    ), "Mask shape is not as expected"
 
     # Marker in place
-    assert (ids[:, 1] == query_tokenizer.Q_marker_token_id).all(), "Query Marker is not after the first token"
+    assert (
+        ids[:, 1] == query_tokenizer.Q_marker_token_id
+    ).all(), "Query Marker is not after the first token"
 
     print("All tests passed!")
 
 
-
 def test_doc_basic_tensorize(args: argparse.Namespace) -> None:
-
     print("Testing DocTokenizer.tensorize shape and marker position")
     config = ColBERTConfig.load_from_checkpoint(args.checkpoint)
     doc_tokenizer = DocTokenizer(config)
@@ -70,7 +75,9 @@ def test_doc_basic_tensorize(args: argparse.Namespace) -> None:
         print(f"{ids.shape=}")
 
     # Marker in place
-    assert (ids[:, 1] == doc_tokenizer.D_marker_token_id).all(), "Document Marker is not after the first token"
+    assert (
+        ids[:, 1] == doc_tokenizer.D_marker_token_id
+    ).all(), "Document Marker is not after the first token"
 
     print("All tests passed!")
 
@@ -86,21 +93,87 @@ def test_tensorize_colbert_v2() -> None:
         for example in query_tokenizer.tok.batch_decode(ids):
             print(example, "\n")
 
-    expected_query_ids = torch.tensor([
-        101, 1, 2054, 3609, 2003, 8994, 17996, 102, 103, 103, 
-        103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 
-        103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103,
-    ])
+    expected_query_ids = torch.tensor(
+        [
+            101,
+            1,
+            2054,
+            3609,
+            2003,
+            8994,
+            17996,
+            102,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+            103,
+        ]
+    )
 
-    expected_query_mask = torch.tensor([
-        1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    ])
+    expected_query_mask = torch.tensor(
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]
+    )
 
-    assert (ids == expected_query_ids.to(ids.device)).all(), "Query tokenized ids not as expected for colbertv2.0 on single example"
+    assert (
+        ids == expected_query_ids.to(ids.device)
+    ).all(), "Query tokenized ids not as expected for colbertv2.0 on single example"
 
-    assert (mask == expected_query_mask.to(mask.device)).all(), "Query tokenized mask is not as expected for colbertv2.0 on single example"
+    assert (
+        mask == expected_query_mask.to(mask.device)
+    ).all(), "Query tokenized mask is not as expected for colbertv2.0 on single example"
 
     doc_tokenizer = DocTokenizer(config)
     ids, mask = doc_tokenizer.tensorize(MARCO_DOCS)
@@ -108,32 +181,225 @@ def test_tensorize_colbert_v2() -> None:
     if args.verbose:
         print("Tokenized Doc:")
         print(doc_tokenizer.tok.decode(ids[0]))
-    
-    expected_doc_ids = torch.tensor([
-        101,     2,  1996,  3739,  1997,  4807, 13463,  4045,  9273,  2001,
-        8053,  2590,  2000,  1996,  3112,  1997,  1996,  7128,  2622,  2004,
-        4045, 24823,  2001,  1012,  1996,  2069,  6112,  5689,  2058,  1996,
-        8052,  6344,  1997,  1996,  9593,  6950,  1998,  6145,  2003,  2054,
-        2037,  3112,  5621,  3214,  1025,  5606,  1997,  5190,  1997,  7036,
-        3268, 27885, 22779,  9250,  1012,   102,     0,     0,     0,     0,
-        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-        0,     0,     0,     0,     0,     0,     0,     0,     0,     0
-    ])
 
-    expected_doc_mask =  torch.tensor([
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0 
-    ])
+    expected_doc_ids = torch.tensor(
+        [
+            101,
+            2,
+            1996,
+            3739,
+            1997,
+            4807,
+            13463,
+            4045,
+            9273,
+            2001,
+            8053,
+            2590,
+            2000,
+            1996,
+            3112,
+            1997,
+            1996,
+            7128,
+            2622,
+            2004,
+            4045,
+            24823,
+            2001,
+            1012,
+            1996,
+            2069,
+            6112,
+            5689,
+            2058,
+            1996,
+            8052,
+            6344,
+            1997,
+            1996,
+            9593,
+            6950,
+            1998,
+            6145,
+            2003,
+            2054,
+            2037,
+            3112,
+            5621,
+            3214,
+            1025,
+            5606,
+            1997,
+            5190,
+            1997,
+            7036,
+            3268,
+            27885,
+            22779,
+            9250,
+            1012,
+            102,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]
+    )
 
-    assert (ids[0] == expected_doc_ids.to(ids.device)).all(), "Doc tokenized ids not as expected for colbertv2.0 on single example"
+    expected_doc_mask = torch.tensor(
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]
+    )
 
-    assert (mask[0] == expected_doc_mask.to(mask.device)).all(), "Doc tokenized mask is not as expected for colbertv2.0 on single example"
-    
+    assert (
+        ids[0] == expected_doc_ids.to(ids.device)
+    ).all(), "Doc tokenized ids not as expected for colbertv2.0 on single example"
+
+    assert (
+        mask[0] == expected_doc_mask.to(mask.device)
+    ).all(), "Doc tokenized mask is not as expected for colbertv2.0 on single example"
+
     print("All tests passed!")
 
 
@@ -149,12 +415,12 @@ if __name__ == "__main__":
         "--checkpoint",
         type=str,
         help="Model checkpoint",
-        default="colbert-ir/colbertv2.0"
+        default="colbert-ir/colbertv2.0",
     )
     parser.add_argument(
         "-v",
         "--verbose",
-        action='store_true',
+        action="store_true",
         help="Whether to print the tokenized queries and documents",
     )
     args = parser.parse_args()

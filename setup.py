@@ -29,6 +29,7 @@ setuptools.setup(
         "tqdm",
         "transformers",
         "ujson",
+        "mlflow",
     ],
     extras_require={
         "faiss-gpu": ["faiss-gpu>=1.7.0"],
