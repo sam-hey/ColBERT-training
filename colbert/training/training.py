@@ -22,8 +22,6 @@ import mlflow
 
 def train(config: ColBERTConfig, triples, queries=None, collection=None):
     mlflow.active_run()
-    mlflow.autolog()
-    mlflow.torch.autolog()
     config.checkpoint = config.checkpoint or "bert-base-uncased"
 
     if config.rank < 1:
