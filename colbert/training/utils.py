@@ -16,10 +16,14 @@ def print_progress(scores):
     print(
         "#>>>   ", positive_avg, negative_avg, "\t\t|\t\t", positive_avg - negative_avg
     )
-
-    mlflow.log_metric("positive_avg", positive_avg)
-    mlflow.log_metric("negative_avg", negative_avg)
-    mlflow.log_metric("positive_minus_negative_avg", positive_avg - negative_avg)
+    mlflow.log_metrics(
+        {
+            "positive_avg": positive_avg,
+            "negative_avg": negative_avg,
+            "positive_minus_negative_avg": positive_avg - negative_avg,
+        },
+        synchronous=False,
+    )
 
 
 def manage_checkpoints(
