@@ -160,16 +160,10 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
                 else:
                     loss = nn.CrossEntropyLoss()(scores, labels[: scores.size(0)])
-                    mlflow.log_metric(
-                        "cross_entropy_loss",
-                        loss.item(),
-                        step=batch_idx,
-                        synchronous=False,
-                    )
 
                 if config.use_ib_negatives:
                     if config.rank < 1:
-                        print("\t\t\t\t", loss.item(), ib_loss.item())
+                        print(f"\t\t\t\tLoss: {loss.item()}, IB Loss: {ib_loss.item()}")
                         mlflow.log_metrics(
                             {"ib_loss": ib_loss.item(), "loss": loss.item()},
                             step=batch_idx,
