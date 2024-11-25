@@ -8,6 +8,7 @@ from colbert.infra.run import Run
 import mlflow
 from colbert.modeling.colbert import ColBERT
 from colbert.infra import ColBERTConfig
+from typing import cast
 
 
 def print_progress(scores):
@@ -30,7 +31,7 @@ def print_progress(scores):
 
 def manage_checkpoints(
     args: ColBERTConfig,
-    colbert: ColBERT,
+    colbert: torch.nn.parallel.DistributedDataParallel,
     optimizer: torch.optim.Optimizer,
     batch_idx: int,
     savepath=None,
@@ -41,7 +42,7 @@ def manage_checkpoints(
 
     Parameters:
     args (Namespace): The arguments for the training process.
-    colbert (nn.Module): The ColBERT model being trained.
+    colbert (DistributedDataParallel): The ColBERT model wrapped in DistributedDataParallel.
     optimizer (Optimizer): The optimizer used for training.
     batch_idx (int): The current batch index.
     savepath (str, optional): The path where checkpoints will be saved. Defaults to None.
@@ -90,10 +91,13 @@ def manage_checkpoints(
         # colbert.colbert_config.set_new_key("optimizer_state_dict", optimizer.state_dict())
         # c#olbert.colbert_config.set_new_key("arguments", args.export())
         # colbert.colbert_config.set_new_key("batch", batch_idx)
-        colbert.colbert_config.set("batch_idx", batch_idx)
+        colbert_module = cast(ColBERT, colbert.module)
+        colbert_module.colbert_config.set("batch_idx", batch_idx)
         # colbert.colbert_config.set("model_state_dict", colbert.state_dict())
-        colbert.colbert_config.set("optimizer_state_dict", optimizer.state_dict())
-        colbert.colbert_config.set("arguments", args.export())
+        colbert_module.colbert_config.set(
+            "optimizer_state_dict", optimizer.state_dict()
+        )
+        colbert_module.colbert_config.set("arguments", args.export())
 
         save(path_save)
 
