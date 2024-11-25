@@ -97,7 +97,7 @@ def manage_checkpoints(
         colbert_module.colbert_config.set(
             "optimizer_state_dict", optimizer.state_dict()
         )
-        colbert_module.colbert_config.set("arguments", args.export())
+        #colbert_module.colbert_config.set("arguments", args.export().tolist())
 
         save(path_save)
 
