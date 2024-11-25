@@ -14,6 +14,12 @@ class Trainer:
         self.collection = collection
 
     def configure(self, **kw_args):
+        """
+        Configures the trainer with the provided keyword arguments.
+
+        Args:
+            **kw_args: Arbitrary keyword arguments to configure the trainer.
+        """
         self.config.configure(**kw_args)
 
     def train(self, checkpoint="bert-base-uncased"):

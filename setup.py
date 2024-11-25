@@ -32,6 +32,7 @@ setuptools.setup(
         "mlflow",
     ],
     extras_require={
+        "bitarray": ["bitarray==2.9.3"],
         "faiss-gpu": ["faiss-gpu>=1.7.0"],
         "faiss-cpu": ["faiss-cpu>=1.7.0"],
         "torch": ["torch==1.13.1"],

@@ -6,6 +6,8 @@ from colbert.utils.utils import print_message, save_checkpoint
 from colbert.parameters import SAVED_CHECKPOINTS
 from colbert.infra.run import Run
 import mlflow
+from colbert.modeling.colbert import ColBERT
+from colbert.infra import ColBERTConfig
 
 
 def print_progress(scores):
@@ -27,8 +29,27 @@ def print_progress(scores):
 
 
 def manage_checkpoints(
-    args, colbert, optimizer, batch_idx, savepath=None, consumed_all_triples=False
+    args: ColBERTConfig,
+    colbert: ColBERT,
+    optimizer: torch.optim.Optimizer,
+    batch_idx: int,
+    savepath=None,
+    consumed_all_triples=False,
 ):
+    """
+    Manages the saving of checkpoints during training.
+
+    Parameters:
+    args (Namespace): The arguments for the training process.
+    colbert (nn.Module): The ColBERT model being trained.
+    optimizer (Optimizer): The optimizer used for training.
+    batch_idx (int): The current batch index.
+    savepath (str, optional): The path where checkpoints will be saved. Defaults to None.
+    consumed_all_triples (bool, optional): Flag indicating if all triples have been consumed. Defaults to False.
+
+    Returns:
+    str: The path where the checkpoint was saved, or None if no checkpoint was saved.
+    """
     # arguments = dict(args)
 
     # TODO: Call provenance() on the values that support it??
@@ -59,12 +80,20 @@ def manage_checkpoints(
     if path_save:
         print(f"#> Saving a checkpoint to {path_save} ..")
 
-        checkpoint = {}
-        checkpoint["batch"] = batch_idx
+        # checkpoint = {}
+        # checkpoint["batch"] = batch_idx
         # checkpoint['epoch'] = 0
-        # checkpoint['model_state_dict'] = model.state_dict()
-        # checkpoint['optimizer_state_dict'] = optimizer.state_dict()
-        # checkpoint['arguments'] = arguments
+        # checkpoint["model_state_dict"] = colbert.state_dict()
+        # checkpoint["optimizer_state_dict"] = optimizer.state_dict()
+        # checkpoint["arguments"] = args.export()
+        # colbert.colbert_config.set_new_key("model_state_dict", colbert.state_dict())
+        # colbert.colbert_config.set_new_key("optimizer_state_dict", optimizer.state_dict())
+        # c#olbert.colbert_config.set_new_key("arguments", args.export())
+        # colbert.colbert_config.set_new_key("batch", batch_idx)
+        colbert.colbert_config.set("batch_idx", batch_idx)
+        # colbert.colbert_config.set("model_state_dict", colbert.state_dict())
+        colbert.colbert_config.set("optimizer_state_dict", optimizer.state_dict())
+        colbert.colbert_config.set("arguments", args.export())
 
         save(path_save)
 

@@ -113,11 +113,14 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
     start_batch_idx = 0
 
-    # if config.resume:
-    #     assert config.checkpoint is not None
-    #     start_batch_idx = checkpoint['batch']
+    if config.resume:
+        print("#> Resuming training from checkpoint:", config.checkpoint)
+        assert config.checkpoint is not None
+        start_batch_idx = config.batch_idx
+        reader.skip_to_batch(start_batch_idx, config.bsize)
+        optimizer.load_state_dict(config.optimizer_state_dict)
 
-    #     reader.skip_to_batch(start_batch_idx, checkpoint['arguments']['bsize'])
+        # reader.skip_to_batch(start_batch_idx, config.checkpoint['arguments']['bsize'])
 
     for batch_idx, BatchSteps in zip(range(start_batch_idx, config.maxsteps), reader):
         if (warmup_bert is not None) and warmup_bert <= batch_idx:

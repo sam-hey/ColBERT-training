@@ -41,6 +41,15 @@ class CoreConfig:
                 self.assigned[field.name] = True
 
     def assign_defaults(self):
+        """
+        Assigns default values to the fields of the configuration object.
+
+        This method iterates over all the fields of the configuration object and sets each field's value to its default.
+        It also marks each field as assigned in the `assigned` dictionary.
+
+        Attributes:
+            self (object): The configuration object containing fields and their default values.
+        """
         for field in fields(self):
             setattr(self, field.name, field.default.val)
             self.assigned[field.name] = True
@@ -61,6 +70,20 @@ class CoreConfig:
         """
 
     def set(self, key, value, ignore_unrecognized=False):
+        """
+        Sets the value of a configuration key.
+
+        Parameters:
+        key (str): The configuration key to set.
+        value (any): The value to assign to the configuration key.
+        ignore_unrecognized (bool): If True, unrecognized keys will be ignored. Defaults to False.
+
+        Returns:
+        bool: True if the key was successfully set, otherwise raises an exception.
+
+        Raises:
+        Exception: If the key is unrecognized and ignore_unrecognized is False.
+        """
         if hasattr(self, key):
             setattr(self, key, value)
             self.assigned[key] = True

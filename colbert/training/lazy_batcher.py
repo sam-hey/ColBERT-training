@@ -86,6 +86,21 @@ class LazyBatcher:
             queries, passages, scores, self.bsize // self.accumsteps, self.nway
         )
 
-    # def skip_to_batch(self, batch_idx, intended_batch_size):
-    #     Run.warn(f'Skipping to batch #{batch_idx} (with intended_batch_size = {intended_batch_size}) for training.')
-    #     self.position = intended_batch_size * batch_idx
+    def skip_to_batch(self, batch_idx: int, intended_batch_size: int):
+        """
+        Skips to the specified batch index for training.
+
+        Args:
+            batch_idx (int): The index of the batch to skip to.
+            intended_batch_size (int): The intended size of each batch.
+
+        Prints:
+            A message indicating the batch index and intended batch size.
+
+        Sets:
+            self.position: The position in the dataset corresponding to the start of the specified batch.
+        """
+        print(
+            f"Skipping to batch #{batch_idx} (with intended_batch_size = {intended_batch_size}) for training."
+        )
+        self.position = intended_batch_size * batch_idx

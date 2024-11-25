@@ -18,6 +18,20 @@ from .core_config import *
 class BaseConfig(CoreConfig):
     @classmethod
     def from_existing(cls, *sources):
+        """
+        Creates an instance of the class from existing sources.
+
+        This method takes multiple source objects, extracts their attributes,
+        and combines them to create a new instance of the class.
+
+        Args:
+            sources: A variable number of source objects from which to extract attributes.
+                    Each source object should have an 'assigned' attribute that lists
+                    the names of the attributes to be extracted.
+
+        Returns:
+            An instance of the class with attributes combined from the provided sources.
+        """
         kw_args = {}
 
         for source in sources:

@@ -123,6 +123,28 @@ class QuerySettings:
 
 @dataclass
 class TrainingSettings:
+    """
+    TrainingSettings is a dataclass that holds configuration settings for training a model.
+
+    Attributes:
+        similarity (str): The similarity metric to use. Default is "cosine".
+        bsize (int): The batch size for training. Default is 32.
+        accumsteps (int): The number of accumulation steps. Default is 1.
+        lr (float): The learning rate for training. Default is 3e-06.
+        maxsteps (int): The maximum number of training steps. Default is 500,000.
+        save_every (int): The interval at which to save the model. Default is None.
+        resume (bool): Whether to resume training from a checkpoint. Default is False.
+        warmup (int): The number of warmup steps. Default is None.
+        warmup_bert (int): The number of warmup steps specifically for BERT. Default is None.
+        relu (bool): Whether to use ReLU activation. Default is False.
+        nway (int): The number of ways for N-way classification. Default is 2.
+        use_ib_negatives (bool): Whether to use in-batch negatives. Default is False.
+        reranker (bool): Whether to use a reranker. Default is False.
+        distillation_alpha (float): The alpha value for distillation. Default is 1.0.
+        ignore_scores (bool): Whether to ignore scores. Default is False.
+        model_name (str): The name of the model to use. Default is None.
+    """
+
     similarity: str = DefaultVal("cosine")
 
     bsize: int = DefaultVal(32)
@@ -156,9 +178,34 @@ class TrainingSettings:
 
     model_name: str = DefaultVal(None)  # DefaultVal('bert-base-uncased')
 
+    batch_idx: int = DefaultVal(0)
+
+    optimizer_state_dict: dict = DefaultVal(None)
+
+    model_state_dict: dict = DefaultVal(None)
+
+    arguments: dict = DefaultVal(None)
+
 
 @dataclass
 class IndexingSettings:
+    """
+    IndexingSettings is a dataclass that holds configuration settings for indexing.
+
+    Attributes:
+        index_path (str): Path to the index. Default is None.
+        index_bsize (int): Batch size for indexing. Default is 64.
+        nbits (int): Number of bits for quantization. Default is 1.
+        kmeans_niters (int): Number of iterations for k-means clustering. Default is 4.
+        resume (bool): Flag to indicate whether to resume indexing. Default is False.
+        pool_factor (int): Factor for pooling. Default is 1.
+        clustering_mode (str): Mode of clustering to use. Default is "hierarchical".
+        protected_tokens (int): Number of protected tokens. Default is 0.
+
+    Properties:
+        index_path_ (str): Returns the index path or constructs it from index_root_ and index_name.
+    """
+
     index_path: str = DefaultVal(None)
 
     index_bsize: int = DefaultVal(64)
@@ -182,6 +229,16 @@ class IndexingSettings:
 
 @dataclass
 class SearchSettings:
+    """
+    SearchSettings is a dataclass that holds configuration settings for search operations.
+
+    Attributes:
+        ncells (int): Number of cells to use in the search. Default is None.
+        centroid_score_threshold (float): Threshold for the centroid score. Default is None.
+        ndocs (int): Number of documents to retrieve. Default is None.
+        load_index_with_mmap (bool): Flag to determine if the index should be loaded with memory mapping. Default is False.
+    """
+
     ncells: int = DefaultVal(None)
     centroid_score_threshold: float = DefaultVal(None)
     ndocs: int = DefaultVal(None)

@@ -124,6 +124,24 @@ def run_process_without_mp(callee, config, *args):
 
 
 def setup_new_process(callee, port, return_value_queue, config, *args):
+    """
+    Sets up a new process for distributed training.
+
+    This function initializes the environment variables required for distributed
+    training, sets the random seed, and initializes the distributed backend.
+    It then runs the provided `callee` function within a `Run` context and
+    places the return value in the provided queue.
+
+    Args:
+        callee (callable): The function to be executed in the new process.
+        port (str): The port number for the master node.
+        return_value_queue (multiprocessing.Queue): A queue to store the return value of the `callee` function.
+        config (object): Configuration object containing the rank, number of ranks, and GPU information.
+        *args: Additional arguments to be passed to the `callee` function.
+
+    Returns:
+        None
+    """
     print_memory_stats()
 
     set_seed(12345)
