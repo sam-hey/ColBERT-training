@@ -20,6 +20,13 @@ from colbert.training.utils import print_progress, manage_checkpoints
 import mlflow
 
 
+def load_optimizer_state(optimizer: torch.optim.Optimizer, path_load: str):
+    path = f"{path_load}/optimizer.pt"
+    print(f"Loading optimizer state from {path}")
+    optimizer_state_dict = torch.load(path)
+    optimizer.load_state_dict(optimizer_state_dict)
+
+
 def train(config: ColBERTConfig, triples, queries=None, collection=None):
     mlflow.active_run()
     config.checkpoint = config.checkpoint or "bert-base-uncased"
@@ -73,17 +80,21 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     colbert = colbert.to(DEVICE)
     colbert.train()
 
-    colbert = torch.nn.parallel.DistributedDataParallel(
-        colbert,
-        device_ids=[config.rank],
-        output_device=config.rank,
-        find_unused_parameters=True,
+    colbert: torch.nn.parallel.DistributedDataParallel = (
+        torch.nn.parallel.DistributedDataParallel(
+            colbert,
+            device_ids=[config.rank],
+            output_device=config.rank,
+            find_unused_parameters=True,
+        )
     )
-
     optimizer = AdamW(
         filter(lambda p: p.requires_grad, colbert.parameters()), lr=config.lr, eps=1e-8
     )
-    optimizer.zero_grad()
+    if not config.resume:
+        optimizer.zero_grad()
+    else:
+        load_optimizer_state(optimizer, config.checkpoint)
 
     scheduler = None
     if config.warmup is not None:
@@ -118,7 +129,6 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         assert config.checkpoint is not None
         start_batch_idx = config.batch_idx
         reader.skip_to_batch(start_batch_idx, config.bsize)
-        optimizer.load_state_dict(config.optimizer_state_dict)
 
         # reader.skip_to_batch(start_batch_idx, config.checkpoint['arguments']['bsize'])
 
@@ -192,6 +202,10 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         if config.rank < 1:
             print_message(batch_idx, train_loss)
             manage_checkpoints(config, colbert, optimizer, batch_idx + 1, savepath=None)
+
+    if "batch_idx" not in locals():
+        print("#> Checkpoint is the end! Exiting.")
+        return config.checkpoint
 
     if config.rank < 1:
         print_message("#> Done with all triples!")

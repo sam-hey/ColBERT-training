@@ -9,6 +9,7 @@ import mlflow
 from colbert.modeling.colbert import ColBERT
 from colbert.infra import ColBERTConfig
 from typing import cast
+from pathlib import Path
 
 
 def print_progress(scores):
@@ -27,6 +28,13 @@ def print_progress(scores):
     # },
     # synchronous=False,
     # )
+
+
+def save_optimizer_state(optimizer: torch.optim.Optimizer, path_save: str):
+    path = Path(path_save)
+    if not path.exists():
+        path.mkdir(parents=True)
+    torch.save(optimizer.state_dict(), f"{path_save}/optimizer.pt")
 
 
 def manage_checkpoints(
@@ -94,10 +102,12 @@ def manage_checkpoints(
         colbert_module = cast(ColBERT, colbert.module)
         colbert_module.colbert_config.set("batch_idx", batch_idx)
         # colbert.colbert_config.set("model_state_dict", colbert.state_dict())
-        colbert_module.colbert_config.set(
-            "optimizer_state_dict", optimizer.state_dict()
-        )
-        #colbert_module.colbert_config.set("arguments", args.export().tolist())
+        # colbert_module.colbert_config.set(
+        #    "optimizer_state_dict",
+        #    optimizer.defaults,  # Save hyperparameters and settings
+        # )
+        save_optimizer_state(optimizer, path_save)
+        # colbert_module.colbert_config.set("arguments", args.export().tolist())
 
         save(path_save)
 
