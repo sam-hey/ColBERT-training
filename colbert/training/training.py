@@ -20,13 +20,6 @@ from colbert.training.utils import print_progress, manage_checkpoints
 import mlflow
 
 
-def load_optimizer_state(optimizer: torch.optim.Optimizer, path_load: str):
-    path = f"{path_load}/optimizer.pt"
-    print(f"Loading optimizer state from {path}")
-    optimizer_state_dict = torch.load(path)
-    optimizer.load_state_dict(optimizer_state_dict)
-
-
 def train(config: ColBERTConfig, triples, queries=None, collection=None):
     mlflow.active_run()
     config.checkpoint = config.checkpoint or "bert-base-uncased"
@@ -80,6 +73,12 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     colbert = colbert.to(DEVICE)
     colbert.train()
 
+    if config.resume:
+        print("#> Resuming training from checkpoint:", config.checkpoint)
+        assert config.checkpoint is not None
+        checkpoint = torch.load(config.checkpoint + "/optimizer.pt")
+        colbert.load_state_dict(checkpoint["model"])
+
     colbert: torch.nn.parallel.DistributedDataParallel = (
         torch.nn.parallel.DistributedDataParallel(
             colbert,
@@ -92,9 +91,10 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         filter(lambda p: p.requires_grad, colbert.parameters()), lr=config.lr, eps=1e-8
     )
     if not config.resume:
+        # Reset the gradients of all optimized torch.Tensor s.
         optimizer.zero_grad()
     else:
-        load_optimizer_state(optimizer, config.checkpoint)
+        optimizer.load_state_dict(checkpoint["optimizer"])
 
     scheduler = None
     if config.warmup is not None:
@@ -125,9 +125,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     start_batch_idx = 0
 
     if config.resume:
-        print("#> Resuming training from checkpoint:", config.checkpoint)
-        assert config.checkpoint is not None
-        start_batch_idx = config.batch_idx
+        start_batch_idx = checkpoint["batch_idx"]
         reader.skip_to_batch(start_batch_idx, config.bsize)
 
         # reader.skip_to_batch(start_batch_idx, config.checkpoint['arguments']['bsize'])

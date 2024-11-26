@@ -30,11 +30,20 @@ def print_progress(scores):
     # )
 
 
-def save_optimizer_state(optimizer: torch.optim.Optimizer, path_save: str):
+def save_optimizer_state(
+    optimizer: torch.optim.Optimizer, path_save: str, colbert: ColBERT, batch_idx: int
+):
     path = Path(path_save)
     if not path.exists():
         path.mkdir(parents=True)
-    torch.save(optimizer.state_dict(), f"{path_save}/optimizer.pt")
+    torch.save(
+        {
+            "optimizer": optimizer.state_dict(),
+            "model": colbert.state_dict(),
+            "batch_idx": batch_idx,
+        },
+        f"{path_save}/optimizer.pt",
+    )
 
 
 def manage_checkpoints(
@@ -100,13 +109,16 @@ def manage_checkpoints(
         # c#olbert.colbert_config.set_new_key("arguments", args.export())
         # colbert.colbert_config.set_new_key("batch", batch_idx)
         colbert_module = cast(ColBERT, colbert.module)
-        colbert_module.colbert_config.set("batch_idx", batch_idx)
+        # colbert_module.colbert_config.set("batch_idx", batch_idx)
+        # colbert_module.colbert_config.set("lr", optimizer.param_groups[0]["lr"])
         # colbert.colbert_config.set("model_state_dict", colbert.state_dict())
         # colbert_module.colbert_config.set(
         #    "optimizer_state_dict",
-        #    optimizer.defaults,  # Save hyperparameters and settings
+        #    optimizer.param_groups,  # Save hyperparameters and settings
         # )
-        save_optimizer_state(optimizer, path_save)
+        # colbert_module.state_dict()
+
+        save_optimizer_state(optimizer, path_save, colbert_module, batch_idx)
         # colbert_module.colbert_config.set("arguments", args.export().tolist())
 
         save(path_save)
