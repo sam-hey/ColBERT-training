@@ -44,6 +44,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     mlflow.log_params({"bsize": config.bsize, "accumsteps": config.accumsteps})
 
     if collection is not None:
+        # config.reranker = False => LazyBatcher
         if config.reranker:
             reader = RerankBatcher(
                 config,
@@ -114,8 +115,10 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     warmup_bert = config.warmup_bert
     if warmup_bert is not None:
         set_bert_grad(colbert, False)
-
+    # config.amp = True
     amp = MixedPrecisionManager(config.amp)
+
+    # initalize the labels tensor with 0s
     labels = torch.zeros(config.bsize, dtype=torch.long, device=DEVICE)
 
     start_time = time.time()
@@ -131,6 +134,10 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         # reader.skip_to_batch(start_batch_idx, config.checkpoint['arguments']['bsize'])
 
     for batch_idx, BatchSteps in zip(range(start_batch_idx, config.maxsteps), reader):
+        """
+        We use simple defaults with limited manual exploration on the official development 
+        set for the learning rate (10−5), batch size (32 examples), and warm up (for 20,000 steps) with linear decay.
+        """
         if (warmup_bert is not None) and warmup_bert <= batch_idx:
             set_bert_grad(colbert, True)
             warmup_bert = None
@@ -157,6 +164,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
                     target_scores = (
                         torch.tensor(target_scores).view(-1, config.nway).to(DEVICE)
                     )
+                    # config.distillation_alpha = 1.0
                     target_scores = target_scores * config.distillation_alpha
                     target_scores = torch.nn.functional.log_softmax(
                         target_scores, dim=-1
@@ -168,6 +176,11 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
                     )
 
                 else:
+                    """
+                    We also employ in-batch negatives per GPU, where a cross-entropy
+                    loss is applied to the positive score of each query against all passages
+                    corresponding to other queries in the same batch.
+                    """
                     loss = nn.CrossEntropyLoss()(scores, labels[: scores.size(0)])
 
                 if config.use_ib_negatives:
@@ -190,6 +203,9 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
             this_batch_loss += loss.item()
 
+        # exponential moving average (EMA)
+        # momentum factor = 0.999 controlling how much weight is given to the previous train_loss
+        # the new values do not have a big impact
         train_loss = this_batch_loss if train_loss is None else train_loss
         train_loss = train_loss_mu * train_loss + (1 - train_loss_mu) * this_batch_loss
 
