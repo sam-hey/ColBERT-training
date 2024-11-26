@@ -31,7 +31,11 @@ def print_progress(scores):
 
 
 def save_optimizer_state(
-    optimizer: torch.optim.Optimizer, path_save: str, colbert: ColBERT, batch_idx: int
+    optimizer: torch.optim.Optimizer,
+    path_save: str,
+    colbert: ColBERT,
+    batch_idx: int,
+    train_loss: int,
 ):
     path = Path(path_save)
     if not path.exists():
@@ -41,6 +45,7 @@ def save_optimizer_state(
             "optimizer": optimizer.state_dict(),
             "model": colbert.state_dict(),
             "batch_idx": batch_idx,
+            "train_loss": train_loss,
         },
         f"{path_save}/optimizer.pt",
     )
@@ -53,6 +58,7 @@ def manage_checkpoints(
     batch_idx: int,
     savepath=None,
     consumed_all_triples=False,
+    train_loss: int = None,
 ):
     """
     Manages the saving of checkpoints during training.
@@ -118,7 +124,9 @@ def manage_checkpoints(
         # )
         # colbert_module.state_dict()
 
-        save_optimizer_state(optimizer, path_save, colbert_module, batch_idx)
+        save_optimizer_state(
+            optimizer, path_save, colbert_module, batch_idx, train_loss
+        )
         # colbert_module.colbert_config.set("arguments", args.export().tolist())
 
         save(path_save)

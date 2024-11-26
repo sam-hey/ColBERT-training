@@ -130,6 +130,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     if config.resume:
         start_batch_idx = checkpoint["batch_idx"]
         reader.skip_to_batch(start_batch_idx, config.bsize)
+        train_loss = checkpoint["train_loss"]
 
         # reader.skip_to_batch(start_batch_idx, config.checkpoint['arguments']['bsize'])
 
@@ -215,7 +216,14 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
         if config.rank < 1:
             print_message(batch_idx, train_loss)
-            manage_checkpoints(config, colbert, optimizer, batch_idx + 1, savepath=None)
+            manage_checkpoints(
+                config,
+                colbert,
+                optimizer,
+                batch_idx + 1,
+                savepath=None,
+                train_loss=train_loss,
+            )
 
     if "batch_idx" not in locals():
         print("#> Checkpoint is the end! Exiting.")
@@ -230,6 +238,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
             batch_idx + 1,
             savepath=None,
             consumed_all_triples=True,
+            train_loss=train_loss,
         )
 
         return ckpt_path  # TODO: This should validate and return the best checkpoint, not just the last one.
