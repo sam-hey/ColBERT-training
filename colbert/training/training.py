@@ -18,6 +18,9 @@ from colbert.modeling.reranker.electra import ElectraReranker
 from colbert.utils.utils import print_message
 from colbert.training.utils import print_progress, manage_checkpoints
 import mlflow
+from typing import Any, Union, Tuple
+from torch.distributed.rpc import RRef
+from torch._utils import PyTree
 
 
 def train(config: ColBERTConfig, triples, queries=None, collection=None):
@@ -95,6 +98,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         # Reset the gradients of all optimized torch.Tensor s.
         optimizer.zero_grad()
     else:
+        # Load the optimizer state from the checkpoint.
         optimizer.load_state_dict(checkpoint["optimizer"])
 
     scheduler = None
@@ -153,15 +157,28 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
                 except:
                     encoding, target_scores = batch
                     encoding = [encoding.to(DEVICE)]
+                # colbert => torch.nn.parallel.DistributedDataParallel
+                # Forward pass
+                # calling ColBERT.forward(self, Q, D) ->
+                scores: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]] = (
+                    colbert(*encoding)
+                )
 
-                scores = colbert(*encoding)
-
+                # use_ib_negatives = True
                 if config.use_ib_negatives:
+                    # ib_loss is CrossEntropyLoss for in-batch negatives
+                    # ColBERT.compute_ib_loss()
+                    # ColBERT.forward returns (scores, ib_loss: torch.Tensor )
                     scores, ib_loss = scores
-
+                scores: torch.Tensor
                 scores = scores.view(-1, config.nway)
 
                 if len(target_scores) and not config.ignore_scores:
+                    """
+                    We start from a model trained with hard triples (akin to Khattab et al. (2021b)), 
+                    train with distillation, and then use the distilled model to retrieve 
+                    for the second round of training.
+                    """
                     target_scores = (
                         torch.tensor(target_scores).view(-1, config.nway).to(DEVICE)
                     )
@@ -182,9 +199,15 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
                     loss is applied to the positive score of each query against all passages
                     corresponding to other queries in the same batch.
                     """
+                    """
+                    Preliminary experiments indicate that quality has low sensitivity to this 
+                    initialization and two-round training, suggesting that both of them could 
+                    be avoided to reduce the cost of training.
+                    """
                     loss = nn.CrossEntropyLoss()(scores, labels[: scores.size(0)])
-
+                # config.use_ib_negatives = True
                 if config.use_ib_negatives:
+                    # 0 => rank
                     if config.rank < 1:
                         print(f"\t\t\t\tLoss: {loss.item()}, IB Loss: {ib_loss.item()}")
                         mlflow.log_metrics(
@@ -192,9 +215,13 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
                             step=batch_idx,
                             synchronous=False,
                         )
-
+                    # add ib_loss to the loss if use_ib_negatives is True
                     loss += ib_loss
-
+                # config.accumsteps = 1
+                # normalize the loss if gradient accumulation is used
+                # gradient accumulation is used to simulate a larger batch size
+                # without increasing the memory requirements
+                # the gradients are accumulated over multiple batches
                 loss = loss / config.accumsteps
 
             if config.rank < 1:
@@ -204,7 +231,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
             this_batch_loss += loss.item()
 
-        # exponential moving average (EMA)
+        # weighted average
         # momentum factor = 0.999 controlling how much weight is given to the previous train_loss
         # the new values do not have a big impact
         train_loss = this_batch_loss if train_loss is None else train_loss
@@ -244,7 +271,17 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
         return ckpt_path  # TODO: This should validate and return the best checkpoint, not just the last one.
 
 
-def set_bert_grad(colbert, value):
+def set_bert_grad(
+    colbert: Union[torch.nn.parallel.DistributedDataParallel, ColBERT], value: bool
+):
+    """
+    Sets the requires_grad attribute for all parameters in the BERT model within the given ColBERT model.
+
+    Args:
+        colbert (DistributedDataParallel, ColBERT): The ColBERT model containing the BERT model.
+        value (bool): The value to set for the requires_grad attribute of the BERT model parameters.
+    """
+
     try:
         for p in colbert.bert.parameters():
             assert p.requires_grad is (not value)

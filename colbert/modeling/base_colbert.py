@@ -18,10 +18,10 @@ class BaseColBERT(torch.nn.Module):
     Like HF, evaluation mode is the default.
     """
 
-    def __init__(self, name_or_path, colbert_config=None):
+    def __init__(self, name_or_path, colbert_config: ColBERTConfig = None):
         super().__init__()
 
-        self.colbert_config = ColBERTConfig.from_existing(
+        self.colbert_config: ColBERTConfig = ColBERTConfig.from_existing(
             ColBERTConfig.load_from_checkpoint(name_or_path), colbert_config
         )
         self.name = self.colbert_config.model_name or name_or_path
