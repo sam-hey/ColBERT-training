@@ -89,12 +89,11 @@ def manage_checkpoints(
 
     path_save = None
 
-    if consumed_all_triples or (batch_idx % 2000 == 0):
-        # name = os.path.join(path, "colbert.dnn")
-        # save_checkpoint(name, 0, batch_idx, colbert, optimizer, arguments)
-        path_save = os.path.join(checkpoints_path, "colbert")
-
-    if batch_idx in SAVED_CHECKPOINTS:
+    if (
+        batch_idx in SAVED_CHECKPOINTS
+        or (batch_idx % 2000 == 0)
+        or consumed_all_triples
+    ):
         # name = os.path.join(path, "colbert-{}.dnn".format(batch_idx))
         # save_checkpoint(name, 0, batch_idx, colbert, optimizer, arguments)
         path_save = os.path.join(checkpoints_path, f"colbert-{batch_idx}")
