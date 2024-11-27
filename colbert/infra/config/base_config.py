@@ -1,14 +1,10 @@
 import os
-import torch
 import ujson
 from huggingface_hub import hf_hub_download
-from huggingface_hub.utils import RepositoryNotFoundError
 import dataclasses
 
-from typing import Any
-from collections import defaultdict
-from dataclasses import dataclass, fields
-from colbert.utils.utils import timestamp, torch_load_dnn
+from dataclasses import dataclass
+from colbert.utils.utils import torch_load_dnn
 
 from utility.utils.save_metadata import get_metadata_only
 from .core_config import *

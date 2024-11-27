@@ -3,8 +3,6 @@ Example:  --positives 5,50 1,1000        ~~>    best-5 (in top-50)  +  best-1 (i
 """
 
 import os
-import sys
-import git
 import tqdm
 import ujson
 import random

@@ -45,8 +45,8 @@ class ResidualEmbeddings:
 
             print_message("#> Loading codes and residuals with memory mapping...")
 
-            residuals_path = os.path.join(index_path, f"0.residuals.pt")
-            codes_path = os.path.join(index_path, f"0.codes.pt")
+            residuals_path = os.path.join(index_path, "0.residuals.pt")
+            codes_path = os.path.join(index_path, "0.codes.pt")
 
             codes_size = get_codes_size(index_path, 0)
             storage = torch.IntStorage.from_file(

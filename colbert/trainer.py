@@ -1,6 +1,6 @@
 from colbert.infra.run import Run
 from colbert.infra.launcher import Launcher
-from colbert.infra.config import ColBERTConfig, RunConfig
+from colbert.infra.config import ColBERTConfig
 
 from colbert.training.training import train
 

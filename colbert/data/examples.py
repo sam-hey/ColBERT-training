@@ -1,5 +1,4 @@
 from colbert.infra.run import Run
-import os
 import ujson
 
 from colbert.utils.utils import print_message

@@ -18,7 +18,7 @@ def get_metadata_only():
         args.git_commit_datetime = str(
             git.Repo(search_parent_directories=True).head.object.committed_datetime
         )
-    except git.exc.InvalidGitRepositoryError as e:
+    except git.exc.InvalidGitRepositoryError:
         pass
     args.current_datetime = time.strftime("%b %d, %Y ; %l:%M%p %Z (%z)")
     args.cmd = " ".join(sys.argv)

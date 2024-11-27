@@ -2,7 +2,6 @@ from colbert.infra.config.config import ColBERTConfig
 from colbert.search.strided_tensor import StridedTensor
 from colbert.utils.utils import print_message, flatten
 from colbert.modeling.base_colbert import BaseColBERT
-from colbert.parameters import DEVICE
 
 import torch
 import string
@@ -41,7 +40,7 @@ class ColBERT(BaseColBERT):
             return
 
         print_message(
-            f"Loading segmented_maxsim_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
+            "Loading segmented_maxsim_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
         )
         segmented_maxsim_cpp = load(
             name="segmented_maxsim_cpp",

@@ -1,9 +1,6 @@
-import os
-import time
-import torch
 import ujson
 
-from colbert.utils.utils import f7, print_message, timestamp
+from colbert.utils.utils import print_message
 
 
 def load_contexts(first_hop_topk_path):

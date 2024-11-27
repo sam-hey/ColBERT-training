@@ -1,4 +1,3 @@
-import os
 import argparse
 from collections import namedtuple
 from datasets import load_dataset

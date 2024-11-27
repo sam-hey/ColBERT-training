@@ -11,10 +11,9 @@ from colbert.search.index_storage import IndexScorer
 
 from colbert.infra.provenance import Provenance
 from colbert.infra.run import Run
-from colbert.infra.config import ColBERTConfig, RunConfig
+from colbert.infra.config import ColBERTConfig
 from colbert.infra.launcher import print_memory_stats
 
-import time
 
 TextQueries = Union[str, "list[str]", "dict[int, str]", Queries]
 
@@ -57,7 +56,7 @@ class Searcher:
             self.checkpoint = self.checkpoint.cuda()
         load_index_with_mmap = self.config.load_index_with_mmap
         if load_index_with_mmap and use_gpu:
-            raise ValueError(f"Memory-mapped index can only be used with CPU!")
+            raise ValueError("Memory-mapped index can only be used with CPU!")
         self.ranker = IndexScorer(self.index, use_gpu, load_index_with_mmap)
 
         print_memory_stats()

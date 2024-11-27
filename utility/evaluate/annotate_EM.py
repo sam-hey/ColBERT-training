@@ -1,8 +1,4 @@
 import os
-import sys
-import git
-import tqdm
-import ujson
 import random
 
 from argparse import ArgumentParser

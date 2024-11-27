@@ -1,8 +1,6 @@
-import os
 import argparse
 from collections import namedtuple
 from datasets import load_dataset
-import tqdm
 
 from colbert import Indexer, Searcher, IndexUpdater
 from colbert.infra import ColBERTConfig, RunConfig, Run
@@ -83,7 +81,7 @@ def main(args):
     raised = False
     try:
         index_updater.remove([len(searcher.ranker.doclens)])
-    except ValueError as e:
+    except ValueError:
         raised = True
     assert raised
 

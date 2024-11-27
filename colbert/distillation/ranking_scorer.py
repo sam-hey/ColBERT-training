@@ -24,7 +24,7 @@ class RankingScorer:
         return self.__provenance
 
     def run(self):
-        print_message(f"#> Starting..")
+        print_message("#> Starting..")
 
         qids, pids, *_ = zipstar(self.ranking)
         distillation_scores = self.scorer.launch(qids, pids)

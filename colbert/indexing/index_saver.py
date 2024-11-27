@@ -15,6 +15,7 @@ class IndexSaver:
         self.config = config
 
     def save_codec(self, codec):
+        print_message("Saving the codec to disk.")
         codec.save(index_path=self.config.index_path_)
 
     def load_codec(self):
@@ -24,7 +25,7 @@ class IndexSaver:
         try:
             ResidualCodec.load(index_path=self.config.index_path_)
             return True
-        except Exception as e:
+        except Exception:
             return False
 
     def check_chunk_exists(self, chunk_idx):

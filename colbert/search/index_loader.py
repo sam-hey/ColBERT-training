@@ -1,10 +1,9 @@
 import os
 import ujson
 import torch
-import numpy as np
 import tqdm
 
-from colbert.utils.utils import lengths2offsets, print_message, dotdict, flatten
+from colbert.utils.utils import lengths2offsets, print_message
 from colbert.indexing.codecs.residual import ResidualCodec
 from colbert.indexing.utils import optimize_ivf
 from colbert.search.strided_tensor import StridedTensor
@@ -23,11 +22,11 @@ class IndexLoader:
         self._load_embeddings()
 
     def _load_codec(self):
-        print_message(f"#> Loading codec...")
+        print_message("#> Loading codec...")
         self.codec = ResidualCodec.load(self.index_path)
 
     def _load_ivf(self):
-        print_message(f"#> Loading IVF...")
+        print_message("#> Loading IVF...")
 
         if os.path.exists(os.path.join(self.index_path, "ivf.pid.pt")):
             ivf, ivf_lengths = torch.load(

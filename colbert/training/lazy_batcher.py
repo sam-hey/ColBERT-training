@@ -1,15 +1,12 @@
-import os
-import ujson
 
 from functools import partial
 from colbert.infra.config.config import ColBERTConfig
-from colbert.utils.utils import print_message, zipstar
+from colbert.utils.utils import zipstar
 from colbert.modeling.tokenization import (
     QueryTokenizer,
     DocTokenizer,
     tensorize_triples,
 )
-from colbert.evaluation.loaders import load_collection
 
 from colbert.data.collection import Collection
 from colbert.data.queries import Queries

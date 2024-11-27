@@ -3,8 +3,6 @@ Divide a query set into two.
 """
 
 import os
-import math
-import ujson
 import random
 
 from argparse import ArgumentParser

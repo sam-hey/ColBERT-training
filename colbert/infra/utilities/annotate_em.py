@@ -1,18 +1,12 @@
 from colbert.infra.run import Run
 from colbert.data.collection import Collection
-import os
 import sys
-import git
-import tqdm
-import ujson
-import random
 
-from argparse import ArgumentParser
 from multiprocessing import Pool
 
 from colbert.utils.utils import groupby_first_item, print_message
-from utility.utils.qa_loaders import load_qas_, load_collection_
-from utility.utils.save_metadata import format_metadata, get_metadata
+from utility.utils.qa_loaders import load_qas_
+from utility.utils.save_metadata import format_metadata
 from utility.evaluate.annotate_EM_helpers import *
 
 from colbert.data.ranking import Ranking

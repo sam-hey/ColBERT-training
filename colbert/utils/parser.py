@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 
 import colbert.utils.distributed as distributed
 from colbert.utils.runs import Run
-from colbert.utils.utils import print_message, timestamp, create_directory
+from colbert.utils.utils import print_message
 
 
 class Arguments:

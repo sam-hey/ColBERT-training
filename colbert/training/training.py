@@ -18,8 +18,7 @@ from colbert.modeling.reranker.electra import ElectraReranker
 from colbert.utils.utils import print_message
 from colbert.training.utils import print_progress, manage_checkpoints
 import mlflow
-from typing import Any, Union, Tuple
-from torch.distributed.rpc import RRef
+from typing import Union, Tuple
 
 
 def train(config: ColBERTConfig, triples, queries=None, collection=None):

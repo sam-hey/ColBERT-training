@@ -1,5 +1,4 @@
 import os
-import ujson
 import random
 
 from argparse import ArgumentParser

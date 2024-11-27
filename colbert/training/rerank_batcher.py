@@ -1,9 +1,6 @@
-import os
-import ujson
 
-from functools import partial
 from colbert.infra.config.config import ColBERTConfig
-from colbert.utils.utils import flatten, print_message, zipstar
+from colbert.utils.utils import flatten, zipstar
 from colbert.modeling.reranker.tokenizer import RerankerTokenizer
 
 from colbert.data.collection import Collection

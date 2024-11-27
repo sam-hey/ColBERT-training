@@ -3,10 +3,7 @@ Evaluate MS MARCO Passages ranking.
 """
 
 import os
-import math
 import tqdm
-import ujson
-import random
 
 from argparse import ArgumentParser
 from collections import defaultdict

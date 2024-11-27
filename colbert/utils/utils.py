@@ -4,7 +4,6 @@ import torch
 import datetime
 import itertools
 
-from multiprocessing import Pool
 from collections import OrderedDict, defaultdict
 
 

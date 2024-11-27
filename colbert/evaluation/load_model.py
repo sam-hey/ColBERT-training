@@ -1,9 +1,4 @@
-import os
-import ujson
-import torch
-import random
 
-from collections import defaultdict, OrderedDict
 
 from colbert.parameters import DEVICE
 from colbert.modeling.colbert import ColBERT

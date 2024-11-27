@@ -3,7 +3,6 @@ Source: DPR Implementation from Facebook Research
 https://github.com/facebookresearch/DPR/tree/master/dpr
 """
 
-import string
 import regex
 import unicodedata
 

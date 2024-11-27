@@ -1,4 +1,3 @@
-import os
 import tqdm
 import ujson
 from colbert.infra.provenance import Provenance

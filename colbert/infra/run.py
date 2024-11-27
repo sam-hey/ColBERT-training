@@ -1,7 +1,6 @@
 import os
-import atexit
 
-from colbert.utils.utils import create_directory, print_message, timestamp
+from colbert.utils.utils import create_directory, print_message
 from contextlib import contextmanager
 
 from colbert.infra.config import RunConfig

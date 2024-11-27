@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, request
 from functools import lru_cache
 import math
 import os
 from dotenv import load_dotenv
 
-from colbert.infra import Run, RunConfig, ColBERTConfig
 from colbert import Searcher
 
 load_dotenv()

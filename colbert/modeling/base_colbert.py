@@ -1,6 +1,4 @@
-import os
 import torch
-import sys
 
 from colbert.utils.utils import torch_load_dnn
 

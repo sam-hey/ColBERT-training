@@ -2,10 +2,8 @@ import os
 import torch
 
 # from colbert.utils.runs import Run
-from colbert.utils.utils import print_message, save_checkpoint
 from colbert.parameters import SAVED_CHECKPOINTS
 from colbert.infra.run import Run
-import mlflow
 from colbert.modeling.colbert import ColBERT
 from colbert.infra import ColBERTConfig
 from typing import cast

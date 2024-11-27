@@ -1,11 +1,7 @@
 import os
-import sys
-import tqdm
-import ujson
 import random
 
 from argparse import ArgumentParser
-from collections import OrderedDict
 from colbert.utils.utils import print_message, file_tqdm
 
 

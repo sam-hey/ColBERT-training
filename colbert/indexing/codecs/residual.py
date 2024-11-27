@@ -103,7 +103,7 @@ class ResidualCodec:
             return
 
         print_message(
-            f"Loading decompress_residuals_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
+            "Loading decompress_residuals_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
         )
         decompress_residuals_cpp = load(
             name="decompress_residuals_cpp",
@@ -121,7 +121,7 @@ class ResidualCodec:
         cls.decompress_residuals = decompress_residuals_cpp.decompress_residuals_cpp
 
         print_message(
-            f"Loading packbits_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
+            "Loading packbits_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
         )
         packbits_cpp = load(
             name="packbits_cpp",

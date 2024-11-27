@@ -1,7 +1,6 @@
 import random
 
 from colbert.utils.utils import print_message
-from utility.utils.save_metadata import save_metadata
 from utility.supervision.triples import sample_for_query
 
 from colbert.data.ranking import Ranking

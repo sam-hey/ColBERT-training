@@ -1,13 +1,12 @@
 import os
 import tqdm
-import time
 import ujson
 import torch
 import random
 
 try:
     import faiss
-except ImportError as e:
+except ImportError:
     print("WARNING: faiss must be imported for indexing")
 
 import numpy as np
@@ -24,7 +23,7 @@ from colbert.data.collection import Collection
 from colbert.indexing.collection_encoder import CollectionEncoder
 from colbert.indexing.index_saver import IndexSaver
 from colbert.indexing.utils import optimize_ivf
-from colbert.utils.utils import flatten, print_message
+from colbert.utils.utils import print_message
 
 from colbert.indexing.codecs.residual import ResidualCodec
 
@@ -206,7 +205,7 @@ class CollectionIndexer:
             with open(self.plan_path, "r") as f:
                 try:
                     plan = ujson.load(f)
-                except Exception as e:
+                except Exception:
                     return False
                 if not (
                     "num_chunks" in plan
@@ -278,6 +277,7 @@ class CollectionIndexer:
         offset = 0
         for r in range(self.nranks):
             sub_sample_path = os.path.join(self.config.index_path_, f"sample.{r}.pt")
+            #'.ragatouille/colbert/indexes/tmp_mteb_index/sample.0.pt'
             sub_sample = torch.load(sub_sample_path)
             os.remove(sub_sample_path)
 
@@ -523,7 +523,7 @@ class CollectionIndexer:
             codes.size(),
         )
         if self.verbose > 1:
-            Run().print_main(f"Sorting codes...")
+            Run().print_main("Sorting codes...")
 
             print_memory_stats(f"RANK:{self.rank}")
 
@@ -533,7 +533,7 @@ class CollectionIndexer:
         if self.verbose > 1:
             print_memory_stats(f"RANK:{self.rank}")
 
-            Run().print_main(f"Getting unique codes...")
+            Run().print_main("Getting unique codes...")
 
         ivf_lengths = torch.bincount(values, minlength=self.num_partitions)
         assert ivf_lengths.size(0) == self.num_partitions
@@ -575,7 +575,7 @@ def compute_faiss_kmeans(
 
     centroids = torch.from_numpy(kmeans.centroids)
 
-    print_memory_stats(f"RANK:0*")
+    print_memory_stats("RANK:0*")
 
     if return_value_queue is not None:
         return_value_queue.put(centroids)

@@ -4,7 +4,7 @@ import time
 import torch.multiprocessing as mp
 
 from colbert.infra.run import Run
-from colbert.infra.config import ColBERTConfig, RunConfig
+from colbert.infra.config import ColBERTConfig
 from colbert.infra.launcher import Launcher
 
 from colbert.utils.utils import create_directory, print_message

@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import __main__
-import traceback
 # import mlflow
 
 import colbert.utils.distributed as distributed

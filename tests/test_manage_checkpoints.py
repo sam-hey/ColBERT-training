@@ -1,6 +1,5 @@
 import os
 import torch
-import shutil
 import unittest
 from colbert.training.utils import manage_checkpoints
 from colbert.modeling.colbert import ColBERT

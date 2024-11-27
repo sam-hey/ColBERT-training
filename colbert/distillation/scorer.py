@@ -4,8 +4,7 @@ import tqdm
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from colbert.infra.launcher import Launcher
-from colbert.infra import Run, RunConfig
-from colbert.modeling.reranker.electra import ElectraReranker
+from colbert.infra import Run
 from colbert.utils.utils import flatten
 
 

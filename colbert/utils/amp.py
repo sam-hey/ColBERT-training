@@ -1,6 +1,5 @@
 import torch
 
-from contextlib import contextmanager
 from colbert.utils.utils import NullContextManager
 
 

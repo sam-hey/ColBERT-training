@@ -1,6 +1,5 @@
 import os
 import sys
-import ujson
 
 # import mlflow
 import traceback

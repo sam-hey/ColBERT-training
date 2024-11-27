@@ -3,8 +3,6 @@ Divide a document collection into N-word/token passage spans (with wrap-around f
 """
 
 import os
-import math
-import ujson
 import random
 
 from multiprocessing import Pool

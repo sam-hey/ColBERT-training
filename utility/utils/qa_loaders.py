@@ -1,7 +1,5 @@
-import os
 import ujson
 
-from collections import defaultdict
 from colbert.utils.utils import print_message, file_tqdm
 
 

@@ -1,8 +1,7 @@
 import torch
 
-from colbert.utils.utils import flatten, print_message
+from colbert.utils.utils import print_message
 
-from colbert.indexing.loaders import load_doclens
 from colbert.indexing.codecs.residual_embeddings_strided import (
     ResidualEmbeddingsStrided,
 )
@@ -42,7 +41,7 @@ class IndexScorer(IndexLoader, CandidateGeneration):
             return
 
         print_message(
-            f"Loading filter_pids_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
+            "Loading filter_pids_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
         )
         filter_pids_cpp = load(
             name="filter_pids_cpp",
@@ -58,7 +57,7 @@ class IndexScorer(IndexLoader, CandidateGeneration):
         cls.filter_pids = filter_pids_cpp.filter_pids_cpp
 
         print_message(
-            f"Loading decompress_residuals_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
+            "Loading decompress_residuals_cpp extension (set COLBERT_LOAD_TORCH_EXTENSION_VERBOSE=True for more info)..."
         )
         decompress_residuals_cpp = load(
             name="decompress_residuals_cpp",
