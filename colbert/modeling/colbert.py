@@ -116,7 +116,7 @@ class ColBERT(BaseColBERT):
             scores, D_mask.repeat(Q.size(0), 1, 1), self.colbert_config
         )
 
-        # Get the number of negative samples per query
+        # Get the number of negative samples per query = 2
         nway = self.colbert_config.nway
 
         # Generate indices for all negative samples, excluding the query itself
