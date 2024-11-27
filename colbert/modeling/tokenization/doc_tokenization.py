@@ -1,4 +1,3 @@
-
 # from transformers import BertTokenizerFast
 
 from colbert.modeling.hf_colbert import class_factory

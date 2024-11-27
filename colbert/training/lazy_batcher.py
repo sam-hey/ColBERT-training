@@ -1,4 +1,3 @@
-
 from functools import partial
 from colbert.infra.config.config import ColBERTConfig
 from colbert.utils.utils import zipstar

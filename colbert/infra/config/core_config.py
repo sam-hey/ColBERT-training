@@ -5,7 +5,6 @@ from typing import Any
 from dataclasses import dataclass, fields
 
 
-
 @dataclass
 class DefaultVal:
     val: Any

@@ -1,4 +1,3 @@
-
 from functools import partial
 from colbert.modeling.tokenization import (
     QueryTokenizer,

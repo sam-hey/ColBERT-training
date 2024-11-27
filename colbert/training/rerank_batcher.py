@@ -1,4 +1,3 @@
-
 from colbert.infra.config.config import ColBERTConfig
 from colbert.utils.utils import flatten, zipstar
 from colbert.modeling.reranker.tokenizer import RerankerTokenizer

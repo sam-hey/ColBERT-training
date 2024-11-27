@@ -1,5 +1,3 @@
-
-
 from colbert.parameters import DEVICE
 from colbert.modeling.colbert import ColBERT
 from colbert.utils.utils import print_message, load_checkpoint
