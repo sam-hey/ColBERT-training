@@ -111,7 +111,7 @@ def manage_checkpoints(
         # colbert.colbert_config.set_new_key("optimizer_state_dict", optimizer.state_dict())
         # c#olbert.colbert_config.set_new_key("arguments", args.export())
         # colbert.colbert_config.set_new_key("batch", batch_idx)
-        colbert_module = cast(ColBERT, colbert.module)
+        #colbert_module = cast(ColBERT, colbert.module)
         # colbert_module.colbert_config.set("batch_idx", batch_idx)
         # colbert_module.colbert_config.set("lr", optimizer.param_groups[0]["lr"])
         # colbert.colbert_config.set("model_state_dict", colbert.state_dict())
@@ -122,7 +122,7 @@ def manage_checkpoints(
         # colbert_module.state_dict()
 
         save_optimizer_state(
-            optimizer, path_save, colbert_module, batch_idx, train_loss
+            optimizer, path_save, colbert.module, batch_idx, train_loss
         )
         # colbert_module.colbert_config.set("arguments", args.export().tolist())
 
