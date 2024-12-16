@@ -13,9 +13,14 @@ from colbert.indexing.collection_indexer import encode
 
 
 class Indexer:
-    def __init__(self, checkpoint, config=None, verbose: int = 3):
+    def __init__(self, checkpoint:str, config=None, verbose: int = 3):
         """
         Use Run().context() to choose the run's configuration. They are NOT extracted from `config`.
+
+        Args:
+            checkpoint (str): The checkpoint to use for indexing.
+            config (dict, optional): The configuration to use for indexing. Defaults to None.
+            verbose (int, optional): The verbosity level. Defaults to 3.
         """
 
         self.index_path = None
@@ -54,9 +59,9 @@ class Indexer:
         if len(deleted):
             if not force_silent:
                 print_message(
-                    f"#> Will delete {len(deleted)} files already at {directory} in 20 seconds..."
+                    f"#> Will delete {len(deleted)} files already at {directory}"
                 )
-                time.sleep(20)
+                #time.sleep(20)
 
             for filename in deleted:
                 os.remove(filename)
